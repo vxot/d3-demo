@@ -1,2 +1,2 @@
-# d3-demo
-a demo of d3
+比较好的教程
+http://www.ourd3js.com/wordpress/category/data-driven-documents/

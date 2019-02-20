@@ -1,0 +1,2 @@
+    return require('ganttd3');
+}));

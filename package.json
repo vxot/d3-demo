@@ -1,0 +1,27 @@
+{
+  "name": "d3",
+  "version": "1.0.0",
+  "description": "my d3 demo",
+  "main": "index.js",
+  "directories": {
+    "doc": "doc"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vxot/d3.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vxot/d3/issues"
+  },
+  "homepage": "https://github.com/vxot/d3#readme",
+  "dependencies": {
+    "jquery": "^1.11.1",
+    "d3": "^5.9.1",
+    "bootstrap": "^3.3.7"
+  }
+}

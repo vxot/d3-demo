@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+  <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+  <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+  <script src="../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+  <script src="../node_modules/d3/dist/d3.js"></script>
+
+<!--  <script src="../node_modules/angular/angular.min.js"></script>
+  <script src="../node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js"></script>-->
+</head>
+<body>
+
+<div class="container" style="margin-top: 20px;">
+  <div class="btn-group" style="margin-bottom: 10px;">
+    <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#addLineModal">Add Line</button>
+    <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#addCircleModal">Add Circle</button>
+  </div>
+  <div id="svgCon">
+
+  </div>
+
+</div>
+
+
+
+
+<div class="modal fade" id="addCircleModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">Add Circle</h4>
+      </div>
+      <div class="modal-body">
+        <form class="form-horizontal" role="form">
+          <div class="form-group">
+            <label for="circleY" class="col-sm-2 control-label">Branch Name:</label>
+            <div class="col-sm-10">
+              <select class="form-control" id="circleY">
+                <option></option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="circleX" class="col-sm-2 control-label">Number:</label>
+            <div class="col-sm-10">
+              <input type="number" class="form-control" id="circleX" placeholder="未来这里可以改成时间">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="addCircleOK">OK</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal -->
+</div>
+
+<div class="modal fade" id="addLineModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel">Add Line</h4>
+      </div>
+      <div class="modal-body">
+        <form class="form-horizontal" role="form">
+          <div class="form-group">
+            <label for="lineName" class="col-sm-2 control-label">Name:</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" id="lineName" placeholder="name">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="addLineOK">OK</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal -->
+</div>
+
+</body>
+
+<script>
+  $('#addCircleModal').on('shown.bs.modal', function () {
+   for(var i=0;i<lineMainData.length;i++){
+     $('#circleY').append('<option value="'+ lineMainData[i].coordinate[1] + '">' + lineMainData[i].name + '</option>');
+   }
+  });
+
+//  ===================================================
+
+
+  function dragmove(d) {
+    console.log(11)
+    d3.select(this)
+      .attr("cx", d.cx = d3.event.x )
+      .attr("cy", d.cy = d3.event.y );
+  };
+  d3.selectAll("circle").call(d3.drag().on("drag", dragmove));
+
+//  ===================================================
+
+  var margin = {top: 50, right: 50, bottom: 50, left: 50};
+  var  width = 1150;
+  var  height = 1150;
+  var circleStrokeWidth = 2;
+  var lineStrokeWidth = 2;
+  var r = 5;  //半径
+
+  var scale_x = d3.scaleLinear()
+    .domain([0, 1000]) // 输入范围
+    .range([0, 1000]); // 输出范围
+//  var axis_x = d3.svg.axis().scale(scale_x);
+//  var axis_right = d3.axisRight(scale_x);
+  var axis_left = d3.axisLeft(scale_x);
+  var axis_top = d3.axisTop(scale_x);
+//  var axis_bottom = d3.axisBottom(scale_x);
+
+  var svg = d3.select("#svgCon").append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .attr("style", "border: 1px solid black"); //给一个边框
+
+  svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")").call(axis_left);
+  svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")").call(axis_top);
+  var g = svg.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+
+
+/*================================arrow=========================================*/
+  var defs = svg.append("defs");
+  var arrowMarker = defs.append("marker")
+    .attr("id","arrow")
+    .attr("markerUnits","strokeWidth")
+    .attr("markerWidth","12")
+    .attr("markerHeight","12")
+    .attr("viewBox","0 0 12 12")
+    .attr("refX","6")
+    .attr("refY","6")
+    .attr("orient","auto");
+
+//  var arrow_path = "M2,2 L10,6 L2,10 L6,6 L2,2";
+  var arrow_path = "M4,3 L10,6 L4,9 L6,6 Z";
+
+  arrowMarker.append("path")
+    .attr("d",arrow_path)
+    .attr("fill","#000");
+  /*================================arrow end=========================================*/
+
+  var data = [
+    [{x:100,y:100,c:'#E13EA7'},{x:200,y:100,c:'#E13EA7'},{x:300,y:100,c:'#E13EA7'},{x:400,y:100,c:'#E13EA7'},{x:500,y:100,c:'#E13EA7'}],
+    [{x:129,y:200,c:'#ECD628'},{x:230,y:200,c:'#ECD628'},{x:340,y:200,c:'#ECD628'},{x:430,y:200,c:'#ECD628'},{x:550,y:200,c:'#ECD628'}],
+    [{x:110,y:300,c:'#55D327'},{x:240,y:300,c:'#55D327'},{x:330,y:300,c:'#55D327'},{x:450,y:300,c:'#55D327'},{x:570,y:300,c:'#55D327'}],
+    [{x:130,y:400,c:'#39D6E9'},{x:250,y:400,c:'#39D6E9'},{x:320,y:400,c:'#39D6E9'},{x:470,y:400,c:'#39D6E9'},{x:550,y:400,c:'#39D6E9'}]
+  ];
+
+  var lineMainData = [
+    {coordinate: [50, 100, 1000,100], name : 'master'},
+    {coordinate: [50, 200, 1000,200], name : 'dev'},
+    {coordinate: [50, 300, 1000,300], name : 'test'},
+    {coordinate: [50, 400, 1000,400], name : 'temp'}
+  ];
+
+  $('#addLineOK').click(function () {
+    var maxY = 0;
+    for(var i=0;i<lineMainData.length;i++){
+      if(lineMainData[i].coordinate[1]>maxY){
+        maxY = lineMainData[i].coordinate[1];
+      }
+    }
+    maxY = maxY + 100;
+    g.selectAll('line .main')
+      .append('line');
+    var lineInfo = {coordinate: [50, maxY, 1000, maxY] , name: $('#lineName').val()}
+    lineMainData.push(lineInfo);
+    addMainLine(g, lineInfo);
+    $('#addLineModal').modal('hide');
+  });
+
+  var addMainLine = function (container, lineInfo) {
+    container.append("line")
+      .attr("x1", lineInfo.coordinate[0])
+      .attr("y1", lineInfo.coordinate[1])
+      .attr("x2", lineInfo.coordinate[2])
+      .attr("y2", lineInfo.coordinate[3])
+      .attr("stroke","#8E8E8E")
+      .attr("stroke-dasharray","5,5")
+      .attr("stroke-width",2);
+    //text-anchor属性可设置文本水平排列，有三个取值 start | middle | end。
+    container.append("text")
+      .attr("x", lineInfo.coordinate[0])
+      .attr("y", lineInfo.coordinate[1] - 5)
+      .attr("font-size",20)
+      .attr("text-anchor","start")
+      .attr("font-family","simsun")
+      .text(lineInfo.name)
+  };
+
+  $('#addCircleOK').click(function () {
+    var circleInfo = {x:$('#circleX').val(),y:$('#circleY').val(),c:'#E13EA7'};
+    addCircle(g,circleInfo );
+    $('#addCircleModal').modal('hide');
+  });
+  var addCircle = function(container, circleInfo){
+    container.append("circle")
+      .attr("cx", circleInfo.x)
+      .attr("cy", circleInfo.y)
+      .attr("r", r)
+      .attr("stroke", function (d) {
+        return circleInfo.c;
+      })
+      .attr("fill",function (d) {
+        return circleInfo.c;
+      })
+      .attr("stroke-width",circleStrokeWidth);
+  };
+
+  //绘制主虚线
+  for(var i=0;i<lineMainData.length;i++){
+    addMainLine(g,lineMainData[i]);
+  }
+
+  var lineArrowArr = [];
+
+  for(var i=0;i<data.length;i++){
+    g.selectAll('circle .c'+ i)
+      .data(data[i])
+      .enter()
+      .append("circle")
+      .attr("cx", function (d) {
+        return d.x;
+      })
+      .attr("cy", function (d) {
+        return d.y;
+      })
+      .attr("r", r)
+      .attr("stroke", function (d) {
+        return d.c;
+      })
+      .attr("fill",function (d) {
+        return d.c;
+      })
+      .attr("stroke-width",circleStrokeWidth);
+
+    for(var j=0;j<data[i].length-1;j++){
+      var d = [];
+      d.push( data[i][j].x + r + circleStrokeWidth/2);
+      d.push( data[i][j].y  );
+      d.push( data[i][j+1].x - r - circleStrokeWidth/2 - 7);
+      d.push( data[i][j+1].y );
+      lineArrowArr.push(d);
+    }
+
+  }
+  lineArrowArr.push([106, 100, 126, 188]);
+  lineArrowArr.push([230, 195, 395, 110]);
+//  lineArrowArr.push([456, 300, 406, 100]);
+  g.selectAll("line .c" + i)
+    .data(lineArrowArr)
+    .enter()
+    .append("line")
+    .attr("x1",function (d) {
+      return d[0];
+    })
+    .attr("y1",function (d) {
+      return d[1];
+    })
+    .attr("x2",function (d) {
+      return d[2];
+    })
+    .attr("y2",function (d) {
+      return d[3];
+    })
+    .attr("stroke","#044D6D")
+    .attr("stroke-width",2)
+    .attr("marker-end","url(#arrow)");
+
+
+
+    $('#addCircle').click(function () {
+      alert(1);
+    });
+
+
+</script>
+</html>
